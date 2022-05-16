@@ -93,8 +93,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run:
-          name: scan frontend
+      - run:          
           command: |
              cd frontend
              npm install
@@ -109,8 +108,7 @@ jobs:
       # Your job code here
       - checkout
       - restore_cache:
-      - run:
-          name: scan backend
+      - run:          
           command: |
              cd backend
              npm install
