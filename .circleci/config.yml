@@ -94,7 +94,8 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run:          
+      - run:   
+          name: scan backend dependency     
           command: |
              cd backend
              npm install
@@ -109,7 +110,8 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run:          
+      - run:  
+          name: scan frontend dependency          
           command: |
              cd frontend
              npm install            
