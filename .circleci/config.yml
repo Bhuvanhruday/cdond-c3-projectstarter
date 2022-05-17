@@ -167,5 +167,25 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure      
+      # Here's where you will add some code to rollback on failure  
+
+  configure-infrastructure:
+    docker:
+       - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["00:b4:59:a9:97:71:f5:16:06:7a:0f:50:e4:57:b5:97"] # You can get this ID in the section where you registered the SSH Key
+      - run:
+          name: Install dependencies
+          command: |
+            # install the dependencies needed for your playbook
+            apk add --update ansible 
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+        
+    
 
