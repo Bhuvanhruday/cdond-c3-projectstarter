@@ -203,8 +203,8 @@ jobs:
             pwd
       - run:
           name: Configure server
-          command: |  
-            cat inventory.txt         
+          working_directory: ./.circleci/ansible
+          command: |                   
             ansible-playbook -i inventory.txt configure-server.yml
       
       - destroy-environment
