@@ -199,10 +199,12 @@ jobs:
             # install the dependencies needed for your playbook                             
             apk add --update ansible 
             ansible --version
+            ls -lrt
+            pwd
       - run:
           name: Configure server
           command: |  
-            cat inventory          
+            cat inventory.txt         
             ansible-playbook -i inventory.txt configure-server.yml
       
       - destroy-environment
