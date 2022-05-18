@@ -5,14 +5,18 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+      # Add parameter here
+      workflow-id:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}   
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
             # Your code here
-            exit 1
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 orbs:
   # Choose either one of the orbs below
   # welcome: circleci/welcome-orb@0.4.1
@@ -175,8 +179,9 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
             - project/.circleci/backend_public_url.txt
-      -destroy-environment
-      # Here's where you will add some code to rollback on failure  
+      
+      - destroy-environment
+       
 
   configure-infrastructure:
     docker:
@@ -198,5 +203,5 @@ jobs:
           command: |
             cd ~/project/.circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment
+      - destoy-environment
  
