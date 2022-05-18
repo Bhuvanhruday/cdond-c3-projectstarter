@@ -175,10 +175,10 @@ jobs:
 
             
       - persist_to_workspace:
-          root: .circleci/
+          root: .
           paths:
-            - ansible/inventory.txt
-            - ansible/backend_public_url.txt
+            - .circleci/ansible/inventory.txt
+            - .circleci/ansible/backend_public_url.txt
       
       - destroy-environment
        
@@ -191,17 +191,19 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["00:b4:59:a9:97:71:f5:16:06:7a:0f:50:e4:57:b5:97"] # You can get this ID in the section where you registered the SSH Key
       - attach_workspace:
-          at: /tmp/ansible
+          at: .
       - run:
           name: Install dependencies
+          working_directory: ./.circleci/ansible
           command: |
-            # install the dependencies needed for your playbook
-            apk add openssh-client                   
+            # install the dependencies needed for your playbook                             
             apk add --update ansible 
+            ansible --version
       - run:
           name: Configure server
-          command: |            
-            ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/configure-server.yml
+          command: |  
+            cat inventory          
+            ansible-playbook -i inventory.txt configure-server.yml
       
       - destroy-environment
  
