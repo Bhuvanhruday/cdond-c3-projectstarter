@@ -1,6 +1,12 @@
 version: 2.1
 # Use a package of configuration called an orb.
 
+orbs:
+  # Choose either one of the orbs below
+  # welcome: circleci/welcome-orb@0.4.1
+  # aws-cli: circleci/aws-cli@2.0.3
+# Sequential workflow
+
 commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -17,11 +23,7 @@ commands:
             # Your code here
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-orbs:
-  # Choose either one of the orbs below
-  # welcome: circleci/welcome-orb@0.4.1
-  # aws-cli: circleci/aws-cli@2.0.3
-# Sequential workflow
+
 workflows:
   # Name the workflow
   default:
@@ -173,10 +175,10 @@ jobs:
 
             
       - persist_to_workspace:
-          root: ~/
+          root: .circleci/
           paths:
-            - project/.circleci/ansible/inventory.txt
-            - project/.circleci/backend_public_url.txt
+            - ansible/inventory.txt
+            - ansible/backend_public_url.txt
       
       - destroy-environment
        
@@ -189,18 +191,17 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["00:b4:59:a9:97:71:f5:16:06:7a:0f:50:e4:57:b5:97"] # You can get this ID in the section where you registered the SSH Key
       - attach_workspace:
-          at: ~/
+          at: /tmp/ansible
       - run:
           name: Install dependencies
           command: |
             # install the dependencies needed for your playbook
-            cd ~/project/.circleci/ansible
+            apk add openssh-client                   
             apk add --update ansible 
       - run:
           name: Configure server
-          command: |
-            cd ~/project/.circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
+          command: |            
+            ansible-playbook -i /tmp/ansible/inventory.txt .circleci/ansible/configure-server.yml
       
       - destroy-environment
  
