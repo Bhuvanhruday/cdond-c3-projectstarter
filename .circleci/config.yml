@@ -220,7 +220,7 @@ jobs:
       
       - destroy-environment
  
-   run-migrations:
+  run-migrations:
     docker:
       # Docker image here that supports NodeJS
       - image: circleci/node:13.8.0
@@ -240,7 +240,7 @@ jobs:
           name: Send migration results to kvdb.io
           command: |
             # Your code here
-           if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+          if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               curl https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
