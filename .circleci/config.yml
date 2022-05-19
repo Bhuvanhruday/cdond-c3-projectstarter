@@ -198,12 +198,15 @@ jobs:
           command: |
             # install the dependencies needed for your playbook                             
             apk add --update ansible 
-            ansible --version
+            ansible --version            
+            pwd
             ls -lrt
       - run:
           name: check inventory file
+           working_directory: .circleci/ansible
           command: |
-            pwd            
+            pwd  
+            ls -lrt          
             cat inventory.txt       
       - run:
           name: Configure server
