@@ -209,10 +209,9 @@ jobs:
             ls -lrt          
             cat inventory.txt       
       - run:
-          name: Configure server
-          working_directory: .circleci/ansible
+          name: Configure server          
           command: |                   
-            ansible-playbook -i inventory.txt configure-server.yml
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       
       - destroy-environment
  
