@@ -203,7 +203,7 @@ jobs:
             ls -lrt
       - run:
           name: check inventory file
-           working_directory: .circleci/ansible
+          working_directory: .circleci/ansible
           command: |
             pwd  
             ls -lrt          
