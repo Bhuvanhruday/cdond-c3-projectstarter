@@ -395,7 +395,7 @@ jobs:
               return 1
             fi
       - destroy-environment
-      - revert-migrations
+      - revert-migration
         
 
 
