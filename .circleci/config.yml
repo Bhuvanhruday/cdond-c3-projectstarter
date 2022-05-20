@@ -275,9 +275,12 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')
-            export API_URL="http://${BACKEND_IP}:3030"            
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            BACKEND_IP=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/backendip)
+            echo "in deploy frontend get api url" $BACKEND_IP
+            export API_URL="http://${BACKEND_IP}:3030"   
+            echo API_URL   
+            echo $API_URL         
+            echo API_URL="${API_URL}" >> frontend/.env
             
       - run:
           name: Deploy frontend objects
