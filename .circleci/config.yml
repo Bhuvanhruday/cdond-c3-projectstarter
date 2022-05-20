@@ -339,11 +339,17 @@ jobs:
               
       - run:
           name: Configure server
-          command: |    
+          command: |   
+              cp package* ./dist
+              cd .. 
               tar -C backend -czvf artifact.tar.gz .
+              pwd
               mkdir .circleci/ansible/roles/deploy/files
               mv artifact.tar.gz .circleci/ansible/roles/deploy/files
               cd .circleci/ansible
+              ls -lrt
+              echo "Contents of the inventory.txt file are -------"
+              cat inventory.txt
       - run:
           name: ansible
           command: |
