@@ -37,10 +37,9 @@ commands:
           name: Revert migrations
           when: on_fail
           # Add when this will run
-          command: |
-            SUCCESS = $(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result)            
-            echo $SUCCESS
-            if(( $SUCCESS==1 )); 
+          command: |        
+            
+            if((curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result ==1 )); 
             then
             cd ~/project/backend
             npm install
@@ -251,7 +250,7 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
             echo "matched"
-            curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result  -d '1'
+            curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result -d '1'
             fi
       - destroy-environment  
   deploy-frontend:
@@ -314,16 +313,7 @@ jobs:
             pwd
             apk add --update ansible tar gzip nodejs npm rsync openssh curl nodejs
             pip install awscli
-      
-      - run:
-          name: Deploy backend
-          command: |
-              cd backend
-              apk add --update nodejs-npm
-              apk add --update npm
-              npm install
-              npm run build
-              
+
       - run:
           name: Adding env vars
           command: |
@@ -338,15 +328,31 @@ jobs:
               echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend//.env"
               echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
               echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            
+      - run:
+          name: Deploy backend          
+          command: |
+              cd backend
+              apk add --update nodejs-npm
+              apk add --update npm
+              npm install
+              npm run build
+              echo "---------Build done in run step of deploy backend"
+              pwd
+              ls -lrt
+              npm run prestart:production
               
+        
       - run:
           name: Configure server
           command: |               
               tar -C backend -czvf artifact.tar.gz .
+              echo "inside config server"
               pwd
               mkdir .circleci/ansible/roles/deploy/files
               mv artifact.tar.gz .circleci/ansible/roles/deploy/files
               cd .circleci/ansible
+              echo "listing files"
               ls -lrt           
      
       - run:
