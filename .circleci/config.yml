@@ -317,12 +317,18 @@ jobs:
             cd ~/project/.circleci/ansible
             pwd
             apk add --update ansible tar gzip nodejs npm rsync openssh curl nodejs-npm
-            pip install awscli
-
+            pip install awscli  
+             
+            
       - run:
-          name: Adding env vars
+          name: Deploy backend          
           command: |
-              touch .env
+              cd backend              
+              npm install
+              npm run build
+              echo "---------Build done in run step of deploy backend"
+              pwd
+              ls -lrt   
               echo ENVIRONMENT=production >> "/root/project/backend/dist/.env"
               echo TYPEORM_CONNECTION=postgres >> "/root/project/backend/dist/.env"
               echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity{.ts,.js} >> "/root/project/backend/dist/.env"
@@ -333,17 +339,7 @@ jobs:
               echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "/root/project/backend/dist/.env"
               echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "/root/project/backend/dist/.env"
               echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "/root/project/backend/dist/.env"
-              echo NODE_ENV=production >> "/root/project/backend/dist/.env"
-            
-      - run:
-          name: Deploy backend          
-          command: |
-              cd backend              
-              npm install
-              npm run build
-              echo "---------Build done in run step of deploy backend"
-              pwd
-              ls -lrt              
+              echo NODE_ENV=production >> "/root/project/backend/dist/.env"           
         
       - run:
           name: Configure server
