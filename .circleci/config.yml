@@ -340,7 +340,7 @@ jobs:
               echo "---------Build done in run step of deploy backend"
               pwd
               ls -lrt
-              npm run prestart:production
+              npm run prestart:prod
               
         
       - run:
@@ -363,7 +363,7 @@ jobs:
             cat inventory.txt          
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook deploy-backend.yml -i inventory.txt               
-      - destroy-environment
+      # destroy-environment
       - revert-migration
   
   smoke-test:
