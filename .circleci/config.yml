@@ -347,7 +347,8 @@ jobs:
       - run:
           name: ansible
           command: |
-            cd /root/project/.circleci/ansible             
+            cd /root/project/.circleci/ansible   
+            cat inventory.txt          
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook deploy-backend.yml -i inventory.txt               
       - destroy-environment
