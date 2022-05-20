@@ -349,7 +349,7 @@ jobs:
               pwd
               mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
               mv backend.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
-              cd /root/project/.circleci/ansible/
+              
               echo "listing files"
               ls -lrt           
      
