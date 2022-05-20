@@ -339,9 +339,7 @@ jobs:
               
       - run:
           name: Configure server
-          command: |   
-              cp package* ./dist
-              cd .. 
+          command: |               
               tar -C backend -czvf artifact.tar.gz .
               pwd
               mkdir .circleci/ansible/roles/deploy/files
