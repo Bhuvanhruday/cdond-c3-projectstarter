@@ -177,7 +177,8 @@ jobs:
             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
             echo "http://$BACKEND_PUBLIC_IP:3030" >> .circleci/backend_public_url.txt
             echo "$BACKEND_PUBLIC_IP" >> .circleci/ansible/inventory.txt
-
+            cat .circleci/ansible/inventory.txt
+            curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/backendip  -d '$BACKEND_PUBLIC_IP'
             
       - persist_to_workspace:
           root: .
@@ -310,6 +311,7 @@ jobs:
           name: Install dependencies
           command: |
             cd ~/project/.circleci/ansible
+            pwd
             apk add --update ansible tar gzip nodejs npm rsync openssh curl nodejs
             pip install awscli
       
@@ -348,11 +350,13 @@ jobs:
               ls -lrt
               echo "Contents of the inventory.txt file are -------"
               cat inventory.txt
+     
       - run:
           name: ansible
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople" | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')
-            echo ${BACKEND_IP} >> inventory.txt
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=udapeople-backend" | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')
+            echo "backedndip is:" ${BACKEND_IP} 
+            
             cd /root/project/.circleci/ansible   
             cat inventory.txt          
             export ANSIBLE_HOST_KEY_CHECKING=False
