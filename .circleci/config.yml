@@ -325,10 +325,11 @@ jobs:
           command: |
               cd backend              
               npm install
+              npm fund
+              npm audit fix              
               npm run build
               echo "---------Build done in run step of deploy backend"
-              pwd
-              ls -lrt   
+              pwd              
               echo ENVIRONMENT=production >> "/root/project/backend/dist/.env"
               echo TYPEORM_CONNECTION=postgres >> "/root/project/backend/dist/.env"
               echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity{.ts,.js} >> "/root/project/backend/dist/.env"
@@ -349,9 +350,7 @@ jobs:
               pwd
               mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
               mv backend.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
-              
-              echo "listing files"
-              ls -lrt           
+                   
      
       - run:
           name: ansible
