@@ -316,47 +316,44 @@ jobs:
           command: |
             cd ~/project/.circleci/ansible
             pwd
-            apk add --update ansible tar gzip nodejs npm rsync openssh curl nodejs
+            apk add --update ansible tar gzip nodejs npm rsync openssh curl nodejs-npm
             pip install awscli
 
       - run:
           name: Adding env vars
           command: |
               touch .env
-              echo ENVIRONMENT=production >> "backend/.env"
-              echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-              echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity{.ts,.js} >> "backend/.env"
-              echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-              echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-              echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-              echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"
-              echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend//.env"
-              echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-              echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+              echo ENVIRONMENT=production >> "/root/project/backend/dist/.env"
+              echo TYPEORM_CONNECTION=postgres >> "/root/project/backend/dist/.env"
+              echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity{.ts,.js} >> "/root/project/backend/dist/.env"
+              echo TYPEORM_HOST=$TYPEORM_HOST >> "/root/project/backend/dist/.env"
+              echo TYPEORM_PORT=$TYPEORM_PORT >> "/root/project/backend/dist/.env"
+              echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "/root/project/backend/dist/.env"
+              echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "/root/project/backend/dist/.env"
+              echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "/root/project/backend/dist/.env"
+              echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "/root/project/backend/dist/.env"
+              echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "/root/project/backend/dist/.env"
+              echo NODE_ENV=production >> "/root/project/backend/dist/.env"
             
       - run:
           name: Deploy backend          
           command: |
-              cd backend
-              apk add --update nodejs-npm
-              apk add --update npm
+              cd backend              
               npm install
               npm run build
               echo "---------Build done in run step of deploy backend"
               pwd
-              ls -lrt
-              npm run prestart:prod
-              
+              ls -lrt              
         
       - run:
           name: Configure server
           command: |               
-              tar -C backend -czvf artifact.tar.gz .
+              tar -czvf backend.tar.gz ./backend
               echo "inside config server"
               pwd
-              mkdir .circleci/ansible/roles/deploy/files
-              mv artifact.tar.gz .circleci/ansible/roles/deploy/files
-              cd .circleci/ansible
+              mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
+              mv backend.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
+              cd /root/project/.circleci/ansible/
               echo "listing files"
               ls -lrt           
      
@@ -371,6 +368,8 @@ jobs:
             echo "$BACKEND_IP" >> inventory.txt   
             cat inventory.txt          
             export ANSIBLE_HOST_KEY_CHECKING=False
+            export host_key_checking=False
+            export record_host_keys=False
             ansible-playbook deploy-backend.yml -i inventory.txt               
       # destroy-environment
       - revert-migration
