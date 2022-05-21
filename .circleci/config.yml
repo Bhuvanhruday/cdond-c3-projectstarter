@@ -319,7 +319,7 @@ jobs:
           name: Install dependencies
           command: |            
             pwd
-            apk add --update ansible openssh-client tar gzip nodejs npm             
+            apk add --update ansible openssh-client curl tar gzip nodejs npm             
             pip install awscli  
                        
       - run:
