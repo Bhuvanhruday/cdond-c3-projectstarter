@@ -346,18 +346,14 @@ jobs:
             cat backend/.env
             pwd
             ls -a ./backend                                                
-            cp -r ./backend .circleci/ansible/roles/deploy/files
-            echo "---------Build done in run step of deploy backend"      
-            cd  .circleci/ansible              
-            pwd  
-            cat roles/deploy/main.yml                
+            cp -r ./backend .circleci/ansible/roles/deploy/files                
+            cd  .circleci/ansible                
             BACKEND_IP=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/backendip)
             echo "ip in ansible step"  $BACKEND_IP             
             grep "\S" inventory.txt
             rm -rf inventory.txt
             echo "[web]" > inventory.txt
-            echo "$BACKEND_IP" >> inventory.txt 
-            echo "after amending"
+            echo "$BACKEND_IP" >> inventory.txt             
             cat inventory.txt          
             export ANSIBLE_HOST_KEY_CHECKING=False
             export host_key_checking=False
