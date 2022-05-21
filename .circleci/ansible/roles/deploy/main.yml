@@ -1,10 +1,15 @@
 ---
-- name: "install dependencies."
+- name: "install nodejs."
   become: true
   apt:
     name: ["nodejs", "npm", "net-tools"]
     state: latest
     update_cache: yes
+
+- name: "npm update"
+  become: true
+  npm:
+    name: npm update --save-dev @types/node
 
 - name: "install pm2"
   become: true
@@ -13,6 +18,7 @@
     global: yes
     production: yes
     state: present
+
 
 - name: "upgrade packages."
   become: true
@@ -48,7 +54,7 @@
     TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
 
 - name: "install node dependencies"
-  command: npm i 
+  command: npm i --unsafe-perm
   args:
     chdir: ~/backend
 
