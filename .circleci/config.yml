@@ -355,9 +355,9 @@ jobs:
             echo "ip in ansible step"  $BACKEND_IP
             echo "before removing"
             cat inventory.txt   
-            grep . inventory.txt
+            grep "\S" file.txt
             echo "after removing"
-            cat inventory.tx
+            cat inventory.txt
             echo "$BACKEND_IP" >> inventory.txt 
             echo "after amending"
             cat inventory.txt          
