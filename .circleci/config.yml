@@ -359,7 +359,8 @@ jobs:
           command: |                     
             cd /root/project/.circleci/ansible   
             echo "dir path changed"
-            pwd            
+            pwd  
+            ls -lrt          
             BACKEND_IP=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/backendip)
             echo "ip in ansible step"  $BACKEND_IP
             echo "$BACKEND_IP" >> inventory.txt   
@@ -367,8 +368,8 @@ jobs:
             export ANSIBLE_HOST_KEY_CHECKING=False
             export host_key_checking=False
             export record_host_keys=False
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml               
-      # destroy-environment
+            ansible-playbook -i .circleci/ansible/inventory.txt deploy-backend.yml               
+      - destroy-environment
       - revert-migration
   
   smoke-test:
