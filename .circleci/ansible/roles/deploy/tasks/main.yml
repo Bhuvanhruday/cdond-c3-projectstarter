@@ -35,7 +35,8 @@
 - name: "run backend server"
   become: true
   shell: "pm2 start npm --name 'udapeople' -- start"
-  args:async: 45
-  poll: 0
-  chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
+  args:
+    async: 45
+    poll: 0
+    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
   
