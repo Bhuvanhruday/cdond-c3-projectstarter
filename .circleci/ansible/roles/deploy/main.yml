@@ -1,4 +1,30 @@
 ---
+- name: "clean up server"
+  become: true
+  shell: "sudo rm -rf *"
+
+- name: "git clone repo"
+  become: true
+  shell: "git clone https://github.com/Bhuvanhruday/cdond-c3-projectstarter.git"
+
+- name: "install dependency"
+  become: true
+  shell: "sudo npm install"
+  args:
+    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
+
+- name: "install peers dependency"
+  become: true
+  shell: "sudo npm install -g npm-install-peers"
+  args:
+    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
+
+- name: "build backend server"
+  become: true
+  shell: "npm run build"
+  args:
+    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
+
 - name: "install nodejs."
   become: true
   apt:
@@ -6,58 +32,10 @@
     state: latest
     update_cache: yes
 
-- name: "npm update"
+- name: "run backend server"
   become: true
-  npm:
-    name: npm update --save-dev @types/node
-
-- name: "install pm2"
-  become: true
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-    state: present
-
-
-- name: "upgrade packages."
-  become: true
-  apt:
-    upgrade: "yes"
-
-
-- name: Creates directory
-  file:
-    path: ~/backend
-    state: directory
-    mode: 0755
-
-- name: Unarchive Backend
-  unarchive:
-    src: backend.tar.gz
-    dest:  ~/backend
-
-- name: "start server"
-  command: pm2 start main.js
+  shell: "pm2 start npm --name 'udapeople' -- start"
   args:
-    chdir: ~/backend/dist
-  environment:
-    ENVIRONMENT: production
-    TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-    TYPEORM_MIGRATIONS_DIR: "./migrations"
-    TYPEORM_MIGRATIONS: "./migrations/*.js"
-    TYPEORM_ENTITIES: "./modules/domain/**/*.entity.[.ts,.js]"
-    TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-    TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-    TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-    TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-    TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-
-- name: "install node dependencies"
-  command: npm i --unsafe-perm
-  args:
-    chdir: ~/backend
-
-  
-
-
+    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
+  async: 45
+  poll: 0

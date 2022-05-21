@@ -7,7 +7,10 @@
   vars:
     - ansible_python_interpreter: /usr/bin/python3
     - ansible_host_key_checking: false
-    - ansible_stdout_callback:     
+    - ansible_stdout_callback:   
+      
+  roles:
+    - deploy
 
   environment: 
       ENVIRONMENT: production     
@@ -21,5 +24,4 @@
       TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT')}}"
       TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME')}}"
 
-  roles:
-    - deploy
+  
