@@ -369,7 +369,7 @@ jobs:
             export ANSIBLE_HOST_KEY_CHECKING=False
             export host_key_checking=False
             export record_host_keys=False
-            ansible-playbook -i .circleci/ansible/inventory.txt deploy-backend.yml               
+            ansible-playbook -i inventory.txt deploy-backend.yml               
       - destroy-environment
       - revert-migration
   
