@@ -1,11 +1,4 @@
 ---
-- name: "install dependencies."
-  become: true
-  apt:
-    name: ["nodejs", "npm", "net-tools"]
-    state: latest
-    update_cache: yes
-
 - name: "install pm2"
   become: true
   npm:
@@ -19,22 +12,23 @@
   apt:
     upgrade: "yes"
 
-
-- name: Creates directory
-  file:
-    path: ~/backend
-    state: directory
+- name: extract artifact.tar
+  become: yes
+  unarchive:
+    src: ~/project/artifact.tar.gz
+    dest: /home/ubuntu
+    remote_src: no
     mode: 0755
 
-- name: Unarchive Backend
-  unarchive:
-    src: backend.tar.gz
-    dest:  ~/backend
+- name: Install packages based on package.json.
+  npm:
+    path: /home/ubuntu
 
-- name: "start server"
-  command: pm2 start main.js
-  args:
-    chdir: ~/backend/dist
+- name: start app
+  become: yes
+  shell: |
+    pm2 stop default
+    pm2 start npm -- start
   environment:
     ENVIRONMENT: production
     TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
@@ -47,10 +41,7 @@
     TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
     TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
 
-- name: "install node dependencies"
-  command: npm i 
-  args:
-    chdir: ~/backend
+
 
   
 

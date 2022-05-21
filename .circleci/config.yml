@@ -203,9 +203,11 @@ jobs:
           name: Install dependencies
           working_directory: .circleci/ansible
           command: |
-            # install the dependencies needed for your playbook                             
+            # install the dependencies needed for your playbook 
+            apk add unzip tar gzip curl                            
             apk add --update ansible 
-            ansible --version            
+            ansible --version  
+            pip install awscli          
             pwd
             ls -lrt
       - run:
@@ -312,52 +314,48 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Install Nodejs Npm
+          command: |
+            apk add --update nodejs npm   
+      - run:
           name: Install dependencies
           command: |
-            cd ~/project/.circleci/ansible
-            pwd
-            apk add --update ansible tar gzip nodejs npm rsync openssh curl nodejs-npm
+           
+            apk add unzip tar gzip rsync openssh curl
+            apk add --update ansible
+            echo "installing awscli............."
             pip install awscli  
              
             
       - run:
           name: Deploy backend          
           command: |
-              cd backend              
-              npm install
-              npm fund
-              npm audit fix              
-              npm run build
-              echo "---------Build done in run step of deploy backend"
+              cd backend                  
               pwd              
-              echo ENVIRONMENT=production >> "/root/project/backend/dist/.env"
-              echo TYPEORM_CONNECTION=postgres >> "/root/project/backend/dist/.env"
-              echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity{.ts,.js} >> "/root/project/backend/dist/.env"
-              echo TYPEORM_HOST=$TYPEORM_HOST >> "/root/project/backend/dist/.env"
-              echo TYPEORM_PORT=$TYPEORM_PORT >> "/root/project/backend/dist/.env"
-              echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "/root/project/backend/dist/.env"
-              echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "/root/project/backend/dist/.env"
-              echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "/root/project/backend/dist/.env"
-              echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "/root/project/backend/dist/.env"
-              echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "/root/project/backend/dist/.env"
-              echo NODE_ENV=production >> "/root/project/backend/dist/.env"           
-        
-      - run:
-          name: Configure server
-          command: |               
-              tar -czvf backend.tar.gz ./backend
-              echo "inside config server"
-              pwd
-              mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-              mv backend.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
-                   
-     
+              echo ENVIRONMENT=production >> ".env"
+              echo TYPEORM_CONNECTION=postgres >> ".env"
+              echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity{.ts,.js} >> ".env"
+              echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
+              echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
+              echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
+              echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> ".env"
+              echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> ".env"
+              echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
+              echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
+              echo NODE_ENV=production >> ".env"           
+              npm i
+              npm audit fix   
+              npm run build
+              cp package* ./dist
+              cd ..
+              echo "current directory" pwd
+              tar -C backend -czvf artifact.tar.gz .
+              cd .circleci/ansible     
       - run:
           name: ansible
           command: |                     
-            cd /root/project/.circleci/ansible   
-            echo "dir path changed"
-            pwd            
+            pwd
+            ls -lrt
             BACKEND_IP=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/backendip)
             echo "ip in ansible step"  $BACKEND_IP
             echo "$BACKEND_IP" >> inventory.txt   
@@ -365,7 +363,7 @@ jobs:
             export ANSIBLE_HOST_KEY_CHECKING=False
             export host_key_checking=False
             export record_host_keys=False
-            ansible-playbook deploy-backend.yml -i inventory.txt               
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml          
       # destroy-environment
       - revert-migration
   
