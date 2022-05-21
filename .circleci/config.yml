@@ -421,8 +421,7 @@ jobs:
 
 
 workflows:
-  # Name the workflow
-  slack: circleci/slack@4.10.1
+  # Name the workflow  
   default:
     jobs:
       - build-frontend
