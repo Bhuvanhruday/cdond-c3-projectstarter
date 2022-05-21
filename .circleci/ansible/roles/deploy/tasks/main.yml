@@ -7,6 +7,17 @@
   become: true
   shell: "git clone https://github.com/Bhuvanhruday/cdond-c3-projectstarter.git"
 
+- name: "upgrade packages."
+  become: true
+  apt:
+    upgrade: "yes"
+    
+- name: "install dependencies."
+  become: true
+  apt:
+    name: ["nodejs", "npm"]
+    update_cache: yes
+
 - name: "install dependency"
   become: true
   shell: "sudo npm install"
