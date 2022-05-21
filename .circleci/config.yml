@@ -6,6 +6,7 @@ orbs:
   # welcome: circleci/welcome-orb@0.4.1
   aws-cli: circleci/aws-cli@2.0.3
   node: circleci/node@3.0.0
+    
 
 commands:
   destroy-environment:
@@ -421,6 +422,7 @@ jobs:
 
 workflows:
   # Name the workflow
+  slack: circleci/slack@4.10.1
   default:
     jobs:
       - build-frontend
