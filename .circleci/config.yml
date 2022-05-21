@@ -373,10 +373,7 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml               
       - destroy-environment
       - revert-migration
-    - slack/notify:
-        channel: '#udacity'
-        event: fail
-        template: basic_fail_1
+    
   
   smoke-test:
     docker:
