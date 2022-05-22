@@ -10,7 +10,10 @@ orbs:
 
 commands:
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.       
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
+    parameters:
+      workflow_id:
+        type: string        
     steps:
       - run:
           name: Destroy environments
@@ -190,10 +193,9 @@ jobs:
           root: .
           paths:
             - .circleci/ansible/inventory.txt
-            - .circleci/ansible/backend_public_url.txt
-      
+            - .circleci/ansible/backend_public_url.txt      
       - destroy-environment
-          
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
        
 
   configure-infrastructure:
@@ -225,9 +227,9 @@ jobs:
       - run:
           name: Configure server          
           command: |                   
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
-      
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml      
       - destroy-environment
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
           
  
   run-migrations:
@@ -263,6 +265,7 @@ jobs:
             curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result -d '1'
             fi
       - destroy-environment  
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
           
   deploy-frontend:
     docker:
@@ -309,7 +312,7 @@ jobs:
           command: |
             aws s3 rm --recursive s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment
-          
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migration
 
   deploy-backend:
@@ -382,7 +385,7 @@ jobs:
             export record_host_keys=False
             ansible-playbook -i inventory.txt deploy-backend.yml               
       - destroy-environment
-          
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migration
     
   
@@ -428,7 +431,7 @@ jobs:
               return 1
             fi
       - destroy-environment
-           
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migration     
   
 
