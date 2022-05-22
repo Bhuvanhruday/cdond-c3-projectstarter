@@ -6,6 +6,7 @@ orbs:
   # welcome: circleci/welcome-orb@0.4.1
   aws-cli: circleci/aws-cli@2.0.3
   node: circleci/node@3.0.0
+  slack: circleci/slack@4.10.1
     
 
 commands:
@@ -63,11 +64,15 @@ jobs:
           name: Build front-end
           command: |
            cd frontend
-           npm install
+           npm installa
            npm run build           
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - slack/notify:
+        channel: '#udacity'
+        event: fail
+        template: basic_fail_1
 
   build-backend:
     docker:
