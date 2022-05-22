@@ -42,7 +42,7 @@ commands:
           command: |        
             success_migration=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result)
             echo $success_migration "is mighration value"
-            if(($success_migration=1)); 
+            if(($success_migration eq 1)); 
             then
             cd ~/project/backend
             npm install
@@ -430,15 +430,14 @@ jobs:
         
   cloudfront-update:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: |
-            pip install --upgrade pip
+          command: |            
             apk add --update curl
-            pip3 install --no-cache-dir awscli
+            pip install awscli
       - run:
           name: Update cloudfront distribution
           command: |
