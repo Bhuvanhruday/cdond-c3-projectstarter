@@ -40,8 +40,8 @@ commands:
           when: on_fail
           # Add when this will run
           command: |        
-            
-            if((curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result ==1 )); 
+            success_migration=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result)
+            if((success_migration ==1 )); 
             then
             cd ~/project/backend
             npm install
