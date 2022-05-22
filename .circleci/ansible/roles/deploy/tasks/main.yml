@@ -1,12 +1,4 @@
 ---
-- name: "clean up server"
-  become: true
-  shell: "sudo rm -rf *"
-
-- name: "git clone repo"
-  become: true
-  shell: "git clone https://github.com/Bhuvanhruday/cdond-c3-projectstarter.git"
-
 - name: "upgrade packages."
   become: true
   apt:
@@ -26,26 +18,23 @@
     production: yes
     state: present
 
-- name: "install dependency"
+- name: copy
   become: true
-  shell: "sudo npm install"
-  args:
-    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
+  copy:
+    src:  /root/project/artifact.tar.gz
+    dest: /home/ubuntu/artifact.tar.gz 
+      
 
-- name: "install peers dependency"
+- name: Start PM2
   become: true
-  shell: "sudo npm install -g npm-install-peers"
-  args:
-    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
+  shell: |
+    cd /home/ubuntu/
+    mkdir backend
+    cd backend
+    tar xzf /home/ubuntu/artifact.tar.gz 
+    echo " in backend folder ..f oll files"
+    ls
+    npm install -g npm-install-peers
+    npm run build
+    pm2 start npm -- start
 
-- name: "build backend server"
-  become: true
-  shell: "npm run build"
-  args:
-    chdir: "/home/ubuntu/cdond-c3-projectstarter/backend"
-
-- name: "run backend server"
-  become: true
-  shell: "pm2 start npm -- run start"
- 
-  
