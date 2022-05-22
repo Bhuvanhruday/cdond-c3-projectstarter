@@ -43,12 +43,11 @@ commands:
           command: |        
             success_migration=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result)
             echo $success_migration "is mighration value"
-            if(($success_migration eq 1)); 
+            if(($success_migration == 1)); 
             then
-            cd ~/project/backend
-            npm install
-            #Add revert code here. You can find this in the Getting Started section.
-            npm run migration:revert            
+              cd ~/project/backend
+              npm install            
+              npm run migration:revert            
             fi
             
 
