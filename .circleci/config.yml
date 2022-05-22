@@ -42,7 +42,7 @@ commands:
           command: |        
             success_migration=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result)
             echo $success_migration "is mighration value"
-            if(($success_migration==1)); 
+            if(($success_migration=1)); 
             then
             cd ~/project/backend
             npm install
@@ -421,14 +421,35 @@ jobs:
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
-              return 1
+              return 0
             else
               return 1
             fi
       - destroy-environment
       - revert-migration
         
-
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            pip install --upgrade pip
+            apk add --update curl
+            pip3 install --no-cache-dir awscli
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name udapeople-cloudfront \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople-
+      - destroy-environment
+          
+      - revert-migrations 
 
 workflows:
   # Name the workflow  
@@ -457,6 +478,8 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
       
 
         
