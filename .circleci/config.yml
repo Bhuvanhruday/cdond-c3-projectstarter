@@ -26,22 +26,30 @@ commands:
             cd /
             $dir            
             aws --version            
+            echo "s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+            aws s3 rm s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
+            echo "Destroying environment: << parameters.workflow_id >> "
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} 
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws s3 rb --force s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migration:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
-      # Add parameter here     
+      workflow_id:
+            type: string  
+            default: ${CIRCLE_WORKFLOW_ID:0:7}   
+                
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           # Add when this will run
-          command: |        
-            
-            if((curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result ==1 )); 
+          command: |  
+            pwd
+            cd /
+            $dir       
+            SUCCESS=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result)
+            if(( $SUCCESS == 1 )); 
             then
             cd ~/project/backend
             npm install
@@ -427,7 +435,52 @@ jobs:
       - destroy-environment
       - revert-migration
         
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      -checkout
+      - run: Update cloudfront distribution
+        command: |
+           aws cloudformation deploy \
+          --template-file .circleci/files/cloudfront.yml \
+          --stack-name UdacityProject3Stack \
+          --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+          --tags project=udapeople
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment
+      - revert-migration
 
+cleanup:
+    docker:
+       - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Get old stack workflow id
+          command: |
+            # your code here
+            export OldWorkflowID=$(aws cloudformation \
+                    list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                    --no-paginate --output text)
+                    echo OldWorkflowID: "${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                    --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+            echo Stack names: "${STACKS[@]}" 
+      - run:
+          name: Remove old stacks and files
+          command: |
+            if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+            then
+              echo "no old stack present"
+            else
+              aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
+              aws cloudformation delete-stack --stack-name UdaPeople-frontend-${OldWorkflowID}
+              aws cloudformation delete-stack --stack-name UdaPeople-backend-${OldWorkflowID}
+            fi
 
 workflows:
   # Name the workflow  
@@ -453,10 +506,13 @@ workflows:
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:
-          requires: [run-migrations]
+          requires: [run-migrations,configure-infrastructure]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-      
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
 
         
     
