@@ -441,7 +441,8 @@ jobs:
     steps:
       # Checkout code from git
       -checkout
-      - run: Update cloudfront distribution
+      - run:
+        name: Update cloudfront distribution
         command: |
            aws cloudformation deploy \
           --template-file .circleci/files/cloudfront.yml \
