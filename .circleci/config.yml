@@ -15,7 +15,7 @@ commands:
       # Add parameter here
       workflow-id:
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}            
+        default: ${CIRCLE_WORKFLOW_ID:0:7}   
     steps:
       - run:
           name: Destroy environments
@@ -26,25 +26,22 @@ commands:
             cd /
             $dir            
             aws --version            
-            echo "s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
-            aws s3 rm s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
-            echo "Destroying environment: << parameters.workflow_id >> "
-            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} 
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws s3 rb --force s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migration:
-    description: Revert the last migration if successfully run in the current workflow.        
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      # Add parameter here     
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           # Add when this will run
-          command: |  
-            pwd
-            cd /
-            $dir       
-            SUCCESS=$(curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result)
-            if(( $SUCCESS == 1 )); 
+          command: |        
+            
+            if((curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result ==1 )); 
             then
             cd ~/project/backend
             npm install
@@ -195,9 +192,10 @@ jobs:
           root: .
           paths:
             - .circleci/ansible/inventory.txt
-            - .circleci/ansible/backend_public_url.txt      
+            - .circleci/ansible/backend_public_url.txt
       
-      - destroy-environment  
+      - destroy-environment
+       
 
   configure-infrastructure:
     docker:
@@ -228,10 +226,9 @@ jobs:
       - run:
           name: Configure server          
           command: |                   
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml      
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+      
       - destroy-environment
-          
-          
  
   run-migrations:
     docker:
@@ -266,8 +263,6 @@ jobs:
             curl --insecure https://kvdb.io/Hqn9i49j52Ddgy2TDfd4Fg/migration_result -d '1'
             fi
       - destroy-environment  
-          
-          
   deploy-frontend:
     docker:
       - image: amazon/aws-cli
@@ -313,7 +308,6 @@ jobs:
           command: |
             aws s3 rm --recursive s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment
-          
       - revert-migration
 
   deploy-backend:
@@ -386,7 +380,6 @@ jobs:
             export record_host_keys=False
             ansible-playbook -i inventory.txt deploy-backend.yml               
       - destroy-environment
-          
       - revert-migration
     
   
@@ -432,11 +425,10 @@ jobs:
               return 1
             fi
       - destroy-environment
-          
-      - revert-migration     
-  
+      - revert-migration
+        
 
-  
+
 workflows:
   # Name the workflow  
   default:
@@ -461,10 +453,10 @@ workflows:
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:
-          requires: [run-migrations,configure-infrastructure]
+          requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-     
+      
 
         
     
