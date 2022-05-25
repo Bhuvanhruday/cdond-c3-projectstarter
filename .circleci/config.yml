@@ -23,7 +23,7 @@ commands:
                   "fields": [
                     {
                       "type": "plain_text",
-                      "text": "Environment is being destroyed on failure.",
+                      "text": "Environment would be destroyed on failure.",
                       "emoji": true
                     }
                   ]
@@ -56,7 +56,7 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws s3 rb --force s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}
-
+      - trigger_slack_notif
   revert-migration:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -106,7 +106,7 @@ jobs:
           name: Back-end build
           command: |
              cd backend
-             sudo npm installa
+             sudo npm install
              sudo npm install -g npm-install-peers
              sudo npm run build
       - notify_slack_error
