@@ -10,6 +10,26 @@ orbs:
     
 
 commands:
+  trigger_slack_notif:
+    description: Notif for when environment is destroyed
+    steps:
+      - slack/notify:
+          event: fail
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "Environment is being destroyed on failure.",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
   notify_slack_error:
     steps:
       - slack/notify:
@@ -89,7 +109,7 @@ jobs:
              sudo npm installa
              sudo npm install -g npm-install-peers
              sudo npm run build
-      - notify_slack_error
+      - trigger_slack_notif
       - persist_to_workspace:
           root: ~/
           paths:
