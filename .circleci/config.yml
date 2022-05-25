@@ -80,7 +80,7 @@ jobs:
           name: Back-end build
           command: |
              cd backend
-             sudo npm install
+             sudo npm installa
              sudo npm install -g npm-install-peers
              sudo npm run build
       - persist_to_workspace:
@@ -90,6 +90,10 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - slack/notify:
+          channel: '#udacity'
+          event: fail
+          template: basic_fail_1
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
