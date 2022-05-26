@@ -1,0 +1,18 @@
+#1) URL01 => Github repository : https://github.com/Bhuvanhruday/cdond-c3-projectstarter
+
+
+#2) URL02 =>S3 bucket : http://udapeople-d564280.s3-website-us-east-1.amazonaws.com/#/employees =>old(deleted)
+
+                        http://udapeople-4c0ab53.s3-website-us-east-1.amazonaws.com/#/employees (new)
+
+#3) URL03 => Backend api status : http://54.90.217.29:3030/api/status (old)
+
+				  http://54.147.235.240:3030/api/status (new)
+
+                               
+
+
+#4)URL05 => Prometheus : http://ec2-44-202-9-104.compute-1.amazonaws.com:9090/targets =>old(deleted)
+        (again run)
+			
+			http://ec2-54-175-113-19.compute-1.amazonaws.com:9090/targets
